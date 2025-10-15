@@ -66,7 +66,7 @@ export default function PopularMoviesCarousel({ movies = [] }) {
       <TouchableOpacity
         activeOpacity={0.9}
         style={{ width: ITEM_WIDTH, height: ITEM_HEIGHT }}
-        onPress={() => navigation.navigate('MovieDetails', { id: item.id })}
+        onPress={() => navigation.navigate('MovieDetail', { id: item.id })}
         onPressIn={() => Platform.OS !== 'web' && setActiveIndex(index)}
         onPressOut={() => Platform.OS !== 'web' && setActiveIndex(null)}
         onMouseEnter={handleHoverIn}
