@@ -1,4 +1,3 @@
-// src/components/Person/ImagesSection.js
 import React, { useState } from 'react';
 import {
   View,
