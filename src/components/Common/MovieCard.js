@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   TouchableOpacity,
   ImageBackground,
@@ -11,7 +11,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
-const CARD_HEIGHT = Math.round(width * 0.55);
+const CARD_HEIGHT = Math.round(width * 0.85);
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 export default function MovieCard({
@@ -24,7 +24,7 @@ export default function MovieCard({
     ? `${IMAGE_BASE_URL}${movie.poster_path}`
     : null;
 
-  const scale = new Animated.Value(1);
+  const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
     Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start();
@@ -35,7 +35,7 @@ export default function MovieCard({
   };
 
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
+    <Animated.View style={{ transform: [{ scale }], marginBottom: 16 }}>
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={() => onPress?.(movie?.id)}
@@ -51,7 +51,7 @@ export default function MovieCard({
             resizeMode="cover"
           >
             <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.9)']}
+              colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.95)']}
               style={styles.gradient}
             >
               <View style={styles.row}>
@@ -72,6 +72,16 @@ export default function MovieCard({
               <Text style={styles.year}>
                 {movie?.release_date ? movie.release_date.slice(0, 4) : '—'}
               </Text>
+              {movie?.origin_country && (
+                <Text style={styles.country}>
+                  {movie.origin_country.join(', ')}
+                </Text>
+              )}
+              {movie?.overview && (
+                <Text style={styles.overview} numberOfLines={3}>
+                  {movie.overview}
+                </Text>
+              )}
             </LinearGradient>
           </ImageBackground>
         ) : (
@@ -88,7 +98,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 14,
     overflow: 'hidden',
-    marginBottom: 16,
     backgroundColor: '#121212',
     elevation: 5,
     shadowColor: '#000',
@@ -143,8 +152,18 @@ const styles = StyleSheet.create({
   },
   year: {
     color: '#d0d0d0',
-    marginTop: 6,
+    marginTop: 4,
     fontSize: 13,
+  },
+  country: {
+    color: '#ffd166',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  overview: {
+    color: '#ccc',
+    fontSize: 12,
+    marginTop: 4,
   },
   noImage: {
     backgroundColor: '#333',
