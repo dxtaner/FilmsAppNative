@@ -7,9 +7,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { fetchMovieDetail } from '../../store/movie/movieDetailThunk';
-import { clearMovieDetail } from '../../store/movie/movieDetailSlice';
 import { getPopular } from '../../store/popular/popularThunk.js';
 
 import MoviePoster from './sections/MoviePoster';
@@ -26,7 +25,8 @@ import PopularMoviesCarousel from '../Home/PopularMoviesCarousel.js';
 
 export default function MovieDetailPage() {
   const route = useRoute();
-  const { id } = route.params;
+  const navigation = useNavigation();
+  const { id } = route.params || {};
   const dispatch = useDispatch();
 
   const {
@@ -45,18 +45,14 @@ export default function MovieDetailPage() {
 
   const popularState = useSelector(state => state.popular);
 
-  // Film detayını ve popüler filmleri getir
   useEffect(() => {
     if (id) dispatch(fetchMovieDetail(id));
-    dispatch(getPopular());
-    return () => dispatch(clearMovieDetail());
+    if (!popularState.items.length) dispatch(getPopular());
   }, [id, dispatch]);
 
-  // FlatList için bölümler
   const sections = useMemo(() => {
     const items = [];
 
-    // Popüler Filmler Carousel
     if (
       popularState.items?.length ||
       popularState.loading ||
@@ -88,77 +84,61 @@ export default function MovieDetailPage() {
       });
     }
 
-    // Film Posteri
-    if (movie)
-      items.push({
-        key: 'poster',
-        component: <MoviePoster path={movie.poster_path} />,
-      });
+    if (movie) {
+      items.push(
+        { key: 'poster', component: <MoviePoster path={movie.poster_path} /> },
+        {
+          key: 'providers',
+          component: providers ? (
+            <ProvidersSection providers={providers} />
+          ) : null,
+        },
+        {
+          key: 'overview',
+          component: (
+            <OverviewSection overview={movie.overview} movie={movie} />
+          ),
+        },
+        {
+          key: 'credits',
+          component: credits ? <CreditsSection credits={credits} /> : null,
+        },
+        {
+          key: 'videos',
+          component: videos?.length ? <VideosSection videos={videos} /> : null,
+        },
+        {
+          key: 'external',
+          component: externalIds ? <ExId externalIds={externalIds} /> : null,
+        },
+        {
+          key: 'keywords',
+          component: keywords?.length ? (
+            <KeywordsSection keywords={keywords} />
+          ) : null,
+        },
+        {
+          key: 'reviews',
+          component: reviews?.length ? (
+            <ReviewsSection reviews={reviews} />
+          ) : null,
+        },
+        {
+          key: 'images',
+          component: images?.backdrops?.length ? (
+            <ImagesSection images={images} />
+          ) : null,
+        },
+        {
+          key: 'similar',
+          component: similar?.length ? (
+            <SimilarMoviesSection movies={similar} />
+          ) : null,
+        },
+      );
+    }
 
-    // Sağlayıcılar
-    if (providers)
-      items.push({
-        key: 'providers',
-        component: <ProvidersSection providers={providers} />,
-      });
-
-    // Özet
-    if (movie?.overview)
-      items.push({
-        key: 'overview',
-        component: <OverviewSection overview={movie.overview} movie={movie} />,
-      });
-
-    // Oyuncu ve ekip
-    if (credits?.cast?.length || credits?.crew?.length)
-      items.push({
-        key: 'credits',
-        component: <CreditsSection credits={credits} />,
-      });
-
-    // Videolar
-    if (videos?.length)
-      items.push({
-        key: 'videos',
-        component: <VideosSection videos={videos} />,
-      });
-
-    // External IDs
-    if (externalIds)
-      items.push({
-        key: 'external',
-        component: <ExId externalIds={externalIds} />,
-      });
-
-    // Anahtar kelimeler
-    if (keywords?.length)
-      items.push({
-        key: 'keywords',
-        component: <KeywordsSection keywords={keywords} />,
-      });
-
-    // İncelemeler
-    if (reviews?.length)
-      items.push({
-        key: 'reviews',
-        component: <ReviewsSection reviews={reviews} />,
-      });
-
-    // Görseller
-    if (images?.backdrops?.length)
-      items.push({
-        key: 'images',
-        component: <ImagesSection images={images} />,
-      });
-
-    // Benzer filmler
-    if (similar?.length)
-      items.push({
-        key: 'similar',
-        component: <SimilarMoviesSection movies={similar} />,
-      });
-
-    return items;
+    return items.filter(i => i.component); // null componentleri kaldır
   }, [
     movie,
     providers,
@@ -168,11 +148,11 @@ export default function MovieDetailPage() {
     reviews,
     images,
     similar,
+    credits,
     popularState,
   ]);
 
-  // Loading veya error durumları
-  if (loading)
+  if (loading && !movie)
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#FFD166" />
@@ -187,7 +167,14 @@ export default function MovieDetailPage() {
       </View>
     );
 
-  if (!movie && !popularState.items.length) return null;
+  if (!movie && !popularState.items.length)
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: '#ccc' }}>
+          Film seçilmedi veya veriler yükleniyor.
+        </Text>
+      </View>
+    );
 
   return (
     <FlatList
