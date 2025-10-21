@@ -1,6 +1,6 @@
 // src/store/movie/movieDetailSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchMovieDetail } from './movieDetailThunk';
+import { fetchMovieDetail } from './movieDetailThunk.js';
 
 const movieDetailSlice = createSlice({
   name: 'movieDetail',
