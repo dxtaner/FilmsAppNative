@@ -23,60 +23,59 @@ export default function MovieCard({
   const posterUri = movie?.poster_path
     ? `${IMAGE_BASE_URL}${movie.poster_path}`
     : null;
-
   const scale = useRef(new Animated.Value(1)).current;
 
-  const handlePressIn = () => {
+  const handlePressIn = () =>
     Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start();
-  };
-
-  const handlePressOut = () => {
+  const handlePressOut = () =>
     Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
-  };
 
   return (
-    <Animated.View style={{ transform: [{ scale }], marginBottom: 16 }}>
+    <Animated.View
+      style={[{ transform: [{ scale }], marginBottom: 16 }, style]}
+    >
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={() => onPress?.(movie?.id)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[styles.card, style]}
+        style={styles.card}
       >
         {posterUri ? (
           <ImageBackground
             source={{ uri: posterUri }}
             style={styles.image}
             imageStyle={styles.imageStyle}
-            resizeMode="cover"
           >
             <LinearGradient
               colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.95)']}
               style={styles.gradient}
             >
-              <View style={styles.row}>
+              <View style={styles.headerRow}>
                 <Text style={styles.title} numberOfLines={2}>
-                  {movie?.title ?? movie?.name ?? 'İsim yok'}
+                  {movie?.title || movie?.name || 'İsim yok'}
                 </Text>
                 {showRating && (
                   <View style={styles.ratingContainer}>
                     <Text style={styles.ratingStar}>⭐</Text>
                     <Text style={styles.ratingText}>
-                      {movie?.vote_average
-                        ? movie.vote_average.toFixed(1)
-                        : '-'}
+                      {movie?.vote_average?.toFixed(1) || '-'}
                     </Text>
                   </View>
                 )}
               </View>
-              <Text style={styles.year}>
-                {movie?.release_date ? movie.release_date.slice(0, 4) : '—'}
-              </Text>
-              {movie?.origin_country && (
-                <Text style={styles.country}>
-                  {movie.origin_country.join(', ')}
+
+              <View style={styles.infoRow}>
+                <Text style={styles.year}>
+                  {movie?.release_date?.slice(0, 4) || '—'}
                 </Text>
-              )}
+                {movie?.origin_country && (
+                  <Text style={styles.country}>
+                    {movie.origin_country.join(', ')}
+                  </Text>
+                )}
+              </View>
+
               {movie?.overview && (
                 <Text style={styles.overview} numberOfLines={3}>
                   {movie.overview}
@@ -86,7 +85,7 @@ export default function MovieCard({
           </ImageBackground>
         ) : (
           <View style={[styles.image, styles.noImage]}>
-            <Text style={styles.noImageText}>No Image</Text>
+            <Text style={styles.noImageText}>Resim yok</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -110,20 +109,17 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT,
     justifyContent: 'flex-end',
   },
-  imageStyle: {
-    borderRadius: 14,
-  },
+  imageStyle: { borderRadius: 14 },
   gradient: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    padding: 12,
     justifyContent: 'flex-end',
     borderBottomLeftRadius: 14,
     borderBottomRightRadius: 14,
   },
-  row: {
+  headerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     flex: 1,
@@ -140,38 +136,20 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 8,
   },
-  ratingStar: {
-    color: '#FFD166',
-    marginRight: 2,
-    fontSize: 14,
-  },
-  ratingText: {
-    color: '#FFD166',
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  year: {
-    color: '#d0d0d0',
+  ratingStar: { color: '#FFD166', marginRight: 2, fontSize: 14 },
+  ratingText: { color: '#FFD166', fontWeight: '700', fontSize: 13 },
+  infoRow: {
+    flexDirection: 'row',
     marginTop: 4,
-    fontSize: 13,
+    justifyContent: 'space-between',
   },
-  country: {
-    color: '#ffd166',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  overview: {
-    color: '#ccc',
-    fontSize: 12,
-    marginTop: 4,
-  },
+  year: { color: '#d0d0d0', fontSize: 13 },
+  country: { color: '#ffd166', fontSize: 12 },
+  overview: { color: '#ccc', fontSize: 12, marginTop: 4 },
   noImage: {
     backgroundColor: '#333',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  noImageText: {
-    color: '#888',
-    fontSize: 14,
-  },
+  noImageText: { color: '#888', fontSize: 14 },
 });
