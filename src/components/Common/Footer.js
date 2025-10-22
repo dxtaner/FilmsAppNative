@@ -9,15 +9,16 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 const links = [
   {
-    label: 'About TMDB',
+    label: 'TMDB',
     url: 'https://www.themoviedb.org/',
     icon: 'information-outline',
   },
   {
-    label: 'About API',
+    label: 'API',
     url: 'https://developers.themoviedb.org/3/getting-started/introduction',
     icon: 'api',
   },
@@ -60,7 +61,7 @@ const Footer = () => {
     const scale = new Animated.Value(1);
 
     const onPressIn = () =>
-      Animated.spring(scale, { toValue: 0.9, useNativeDriver: true }).start();
+      Animated.spring(scale, { toValue: 0.85, useNativeDriver: true }).start();
     const onPressOut = () =>
       Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start();
 
@@ -68,24 +69,36 @@ const Footer = () => {
       item.type === 'material' ? MaterialCommunityIcons : FontAwesome;
 
     return (
-      <Animated.View style={{ transform: [{ scale }] }}>
+      <Animated.View
+        style={{
+          transform: [{ scale }],
+          margin: 8,
+          alignItems: 'center',
+          width: 60,
+        }}
+      >
         <TouchableOpacity
-          key={item.label}
-          style={styles.iconButton}
           onPress={() => handlePress(item.url)}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           activeOpacity={0.8}
         >
-          <Icon name={item.icon} size={24} color="#fff" />
+          <LinearGradient
+            colors={['#c8c5bfff', '#de0d3eff']}
+            style={styles.iconButton}
+          >
+            <Icon name={item.icon} size={24} color="#fff" />
+          </LinearGradient>
         </TouchableOpacity>
-        <Text style={styles.iconLabel}>{item.label}</Text>
+        <Text style={styles.iconLabel} numberOfLines={1}>
+          {item.label}
+        </Text>
       </Animated.View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#121212', '#1F1F2E']} style={styles.container}>
       <View style={styles.row}>
         {links.map(item => (
           <IconButton key={item.label} item={item} />
@@ -97,48 +110,44 @@ const Footer = () => {
         ))}
       </View>
       <Text style={styles.copy}>© {new Date().getFullYear()} Taner Özer</Text>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#121212',
-    paddingVertical: 25,
+    paddingVertical: 20,
     alignItems: 'center',
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginVertical: 10,
+    marginVertical: 8,
   },
   iconButton: {
-    backgroundColor: '#1f1f1f',
-    width: 40,
-    height: 40,
-    borderRadius: 30,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
-    marginBottom: 5,
-    elevation: 4,
-    shadowColor: '#000',
+    shadowColor: '#d4cfc3ff',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
+    elevation: 4,
   },
   iconLabel: {
-    color: '#fff',
-    fontSize: 12,
+    color: '#dededeff',
+    fontSize: 11,
     textAlign: 'center',
-    width: 80,
-    marginBottom: 5,
+    marginTop: 3,
+    width: 60,
   },
   copy: {
     color: '#888',
-    fontSize: 12,
-    marginTop: 10,
+    fontSize: 11,
+    marginTop: 12,
   },
 });
 
