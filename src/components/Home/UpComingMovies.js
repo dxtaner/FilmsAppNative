@@ -9,8 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import MovieCard from '../Common/MovieCard';
 import LinearGradient from 'react-native-linear-gradient';
+import MovieCard from '../Common/MovieCard';
 
 const { width } = Dimensions.get('window');
 
@@ -18,10 +18,7 @@ export default function UpComingMovies({ movies = [], loading = false }) {
   const navigation = useNavigation();
 
   const handleDetails = id => {
-    if (!id) {
-      console.warn('Movie id undefined!');
-      return;
-    }
+    if (!id) return console.warn('Movie id undefined!');
     navigation.navigate('MovieDetail', { id });
   };
 
@@ -37,18 +34,15 @@ export default function UpComingMovies({ movies = [], loading = false }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#01b4e4" />
+        <ActivityIndicator size="large" color="#FFD166" />
         <Text style={styles.loadingText}>Filmler yükleniyor...</Text>
       </View>
     );
   }
 
   return (
-    <LinearGradient
-      colors={['#eef1f3ff', '#4ea5c2ff', '#2c5364']}
-      style={styles.container}
-    >
-      <Text style={styles.headerTitle}>🎞 Yaklaşan Filmler</Text>
+    <LinearGradient colors={['#2c3e50', '#4ca1af']} style={styles.container}>
+      <Text style={styles.headerTitle}>🎬 Yaklaşan Filmler</Text>
 
       {movies.length > 0 ? (
         <FlatList
@@ -60,7 +54,7 @@ export default function UpComingMovies({ movies = [], loading = false }) {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Yaklaşan film bulunamadı 🎬</Text>
+          <Text style={styles.emptyText}>Yaklaşan film bulunamadı 😔</Text>
         </View>
       )}
     </LinearGradient>
@@ -74,38 +68,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   headerTitle: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 14,
+    color: '#FFD166',
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: 16,
     textAlign: 'center',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   list: {
-    paddingBottom: 60,
+    paddingBottom: 80,
   },
   cardWrapper: {
-    marginBottom: 16,
+    marginBottom: 18,
     width: width * 0.92,
     alignSelf: 'center',
+    borderRadius: 14,
+    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#121212',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
+    marginTop: 12,
     fontSize: 16,
-    marginTop: 10,
+    color: '#fff',
+    fontWeight: '500',
   },
   emptyContainer: {
     alignItems: 'center',
     marginTop: 80,
   },
   emptyText: {
-    color: '#bbb',
+    color: '#ddd',
     fontSize: 16,
     textAlign: 'center',
   },
