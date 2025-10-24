@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,93 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import SectionTitle from './SectionTitle';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.32;
+const CARD_HEIGHT = CARD_WIDTH * (3 / 1.5);
 const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
+
+const MarqueeText = ({ children, style }) => {
+  const [contentWidth, setContentWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const scrollAnim = useRef(new Animated.Value(0)).current;
+
+  const needsScroll = contentWidth > containerWidth;
+
+  useEffect(() => {
+    if (needsScroll) {
+      scrollAnim.setValue(0);
+
+      const distanceToScroll = contentWidth - containerWidth;
+      const duration = distanceToScroll * 50;
+
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.delay(1500),
+          Animated.timing(scrollAnim, {
+            toValue: -distanceToScroll,
+            duration: duration,
+            useNativeDriver: true,
+          }),
+          Animated.delay(1000),
+          Animated.timing(scrollAnim, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+
+      animation.start();
+      return () => animation.stop();
+    }
+  }, [contentWidth, containerWidth, needsScroll, scrollAnim]);
+
+  if (!children) return null;
+
+  return (
+    <View
+      style={styles.marqueeContainer}
+      onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      <Animated.Text
+        style={[
+          style,
+          {
+            transform: [{ translateX: scrollAnim }],
+            // Kaydırma gerekiyorsa overflow ayarını yap
+            overflow: needsScroll ? 'hidden' : 'visible',
+          },
+        ]}
+        onLayout={e => setContentWidth(e.nativeEvent.layout.width)}
+        numberOfLines={1}
+      >
+        {children}
+      </Animated.Text>
+    </View>
+  );
+};
+
+const getRatingColor = voteAverage => {
+  if (voteAverage === undefined || voteAverage === null) return '#A0A0A0';
+  const normalized = voteAverage / 10;
+  let r, g;
+  if (normalized < 0.5) {
+    r = 255;
+    g = Math.floor(255 * (normalized * 2));
+  } else {
+    r = Math.floor(255 * (1 - (normalized - 0.5) * 2));
+    g = 255;
+  }
+  return `rgb(${r}, ${g}, 0)`;
+};
 
 export default function SimilarMoviesSection({ movies }) {
   const navigation = useNavigation();
-
   if (!movies || movies.length === 0) return null;
 
   const handlePress = movieId => {
@@ -25,8 +102,6 @@ export default function SimilarMoviesSection({ movies }) {
 
   return (
     <View style={styles.container}>
-      <SectionTitle title="Benzer Filmler" />
-
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -47,14 +122,27 @@ export default function SimilarMoviesSection({ movies }) {
               }}
               style={styles.poster}
             />
-            <View style={styles.infoContainer}>
-              <Text numberOfLines={1} style={styles.title}>
-                {movie.title}
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.8)']}
+              style={styles.overlay}
+            >
+              <Text numberOfLines={1} style={styles.date}>
+                {movie.release_date || 'Unknown Date'}
               </Text>
-              <Text style={styles.rating}>
-                ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
-              </Text>
-            </View>
+
+              <MarqueeText style={styles.title}>{movie.title}</MarqueeText>
+
+              <View style={styles.ratingContainer}>
+                <Text
+                  style={[
+                    styles.ratingText,
+                    { color: getRatingColor(movie.vote_average) },
+                  ]}
+                >
+                  {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
+                </Text>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -64,43 +152,59 @@ export default function SimilarMoviesSection({ movies }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 30,
+    marginTop: 25,
     marginBottom: 20,
   },
   scrollContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
+    paddingBottom: 10,
   },
   card: {
-    width: width * 0.33,
-    marginRight: 14,
-    borderRadius: 14,
-    backgroundColor: '#1c1c1c',
+    width: CARD_WIDTH,
+    marginRight: 16,
+    borderRadius: 16,
     overflow: 'hidden',
-    elevation: 4,
+    backgroundColor: '#1a1a1a',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
   },
   poster: {
     width: '100%',
-    height: 180,
+    height: CARD_HEIGHT,
     resizeMode: 'cover',
   },
-  infoContainer: {
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    alignItems: 'center',
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    padding: 8,
+  },
+  date: {
+    color: '#ccc',
+    fontSize: 11,
+    marginBottom: 2,
+  },
+  marqueeContainer: {
+    overflow: 'hidden',
+    height: 16,
+    marginBottom: 2,
   },
   title: {
     color: '#fff',
     fontSize: 13,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: '700',
   },
-  rating: {
-    color: '#FFD166',
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  ratingText: {
     fontSize: 12,
-    marginTop: 2,
+    fontWeight: 'bold',
+    marginRight: 4,
   },
 });
