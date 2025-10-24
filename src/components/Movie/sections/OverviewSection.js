@@ -1,118 +1,164 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Linking } from 'react-native';
 import SectionTitle from './SectionTitle';
 
-const OverviewSection = ({ movie }) => {
+// Basit bir ikonlu detay kartı oluşturmak için yardımcı fonksiyon
+const DetailItem = ({ label, value, color = '#fff' }) => (
+  <View style={styles.detailItem}>
+    <Text style={styles.detailLabel}>{label}</Text>
+    <Text style={[styles.detailValue, { color }]}>{value}</Text>
+  </View>
+);
+
+// Bütçe/Hasılat formatlayıcı
+const formatCurrency = amount => {
+  if (!amount || amount === 0) return '-';
+  if (amount >= 1000000) {
+    return `$${(amount / 1000000).toFixed(1)}M`;
+  }
+  return `$${amount.toLocaleString()}`;
+};
+
+export default function OverviewSection({ movie }) {
   if (!movie) return null;
 
-  const {
-    overview,
-    genres,
-    release_date,
-    runtime,
-    vote_average,
-    tagline,
-    budget,
-    revenue,
-    status,
-    original_language,
-  } = movie;
+  const handleHomepagePress = () => {
+    if (movie.homepage) {
+      Linking.openURL(movie.homepage).catch(err =>
+        console.error('Link açılamadı', err),
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
       {/* Tagline */}
-      {tagline ? <Text style={styles.tagline}>“{tagline}”</Text> : null}
+      {movie.tagline && (
+        <View style={styles.taglineContainer}>
+          <Text style={styles.taglineText}>"{movie.tagline}"</Text>
+        </View>
+      )}
 
-      {/* Özet Başlığı */}
-      <SectionTitle title="Özet" />
+      {/* Film Özeti */}
+      {movie.overview && (
+        <View style={styles.section}>
+          <SectionTitle title="Film Özeti" />
+          <Text style={styles.overviewText}>{movie.overview}</Text>
+        </View>
+      )}
 
-      {/* Özet Metni */}
-      <Text style={styles.overviewText}>
-        {overview || 'Açıklama bulunamadı.'}
-      </Text>
+      {/* Önemli Detaylar */}
+      <View style={[styles.section, styles.detailsGrid]}>
+        <DetailItem
+          label="Süre"
+          value={movie.runtime ? `${movie.runtime}m` : '-'}
+          color="#FFD166"
+        />
+        <DetailItem
+          label="Yayın Tarihi"
+          value={movie.release_date?.split('-')[0] || '-'}
+          color="#fff"
+        />
+        <DetailItem label="Durum" value={movie.status || '-'} color="#01b4e4" />
+      </View>
 
-      {/* Film Detayları */}
-      <View style={styles.infoContainer}>
-        {/* Türler */}
-        {genres?.length > 0 && (
-          <View style={styles.chipContainer}>
-            {genres.map(g => (
-              <View key={g.id} style={styles.chip}>
-                <Text style={styles.chipText}>{g.name}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+      {/* Finans ve Bağlantılar */}
+      <View style={styles.section}>
+        <SectionTitle title="Finans ve Bağlantılar" />
 
-        {/* Temel Bilgiler */}
-        {release_date && (
-          <Text style={styles.infoText}>📅 Yayın Tarihi: {release_date}</Text>
-        )}
-        {runtime && <Text style={styles.infoText}>⏱ Süre: {runtime} dk</Text>}
-        {vote_average !== undefined && (
-          <Text style={styles.infoText}>⭐ Puan: {vote_average}/10</Text>
-        )}
-        {budget && (
-          <Text style={styles.infoText}>
-            💰 Bütçe: ${budget.toLocaleString()}
-          </Text>
-        )}
-        {revenue && (
-          <Text style={styles.infoText}>
-            💸 Gelir: ${revenue.toLocaleString()}
-          </Text>
-        )}
-        {status && <Text style={styles.infoText}>📌 Durum: {status}</Text>}
-        {original_language && (
-          <Text style={styles.infoText}>
-            🗣 Dil: {original_language.toUpperCase()}
+        <View style={styles.financeRow}>
+          <DetailItem label="Bütçe" value={formatCurrency(movie.budget)} />
+          <DetailItem label="Hasılat" value={formatCurrency(movie.revenue)} />
+        </View>
+
+        {movie.homepage && (
+          <Text style={styles.homepageLink} onPress={handleHomepagePress}>
+            🌐 Ziyaret Et ↗
           </Text>
         )}
       </View>
     </View>
   );
-};
-
-export default OverviewSection;
+}
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 16 },
-  tagline: {
-    color: '#ffd166',
-    fontStyle: 'italic',
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  section: {
+    marginBottom: 25,
+  },
+
+  // Tagline
+  taglineContainer: {
+    marginBottom: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFD166',
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+  },
+  taglineText: {
+    color: '#FFD166',
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 12,
+    fontStyle: 'italic',
+    fontWeight: '600',
   },
+
+  // Overview
   overviewText: {
-    color: '#ccc',
+    color: '#eee',
     fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 12,
+    lineHeight: 24,
+    marginTop: 8,
   },
-  infoContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#333',
-    paddingTop: 12,
-  },
-  infoText: {
-    color: '#ccc',
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 4,
-  },
-  chipContainer: {
+
+  // Detay Kartı
+  detailsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8,
+    justifyContent: 'space-around',
+    paddingVertical: 15,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
   },
-  chip: {
-    backgroundColor: '#222',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 16,
-    marginRight: 6,
+  detailItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  detailLabel: {
+    color: '#aaa',
+    fontSize: 12,
+    fontWeight: '500',
     marginBottom: 6,
   },
-  chipText: { color: '#ffd166', fontSize: 12, fontWeight: '700' },
+  detailValue: {
+    fontSize: 17,
+    fontWeight: '700',
+  },
+
+  // Finans
+  financeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    backgroundColor: '#2a2a2a',
+    padding: 15,
+    borderRadius: 10,
+  },
+
+  // Anasayfa Link
+  homepageLink: {
+    marginTop: 12,
+    color: '#01b4e4',
+    fontSize: 15,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
 });
