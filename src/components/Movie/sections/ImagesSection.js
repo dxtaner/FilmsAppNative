@@ -9,7 +9,6 @@ import {
   Modal,
   Dimensions,
 } from 'react-native';
-import SectionTitle from './SectionTitle';
 
 const { width, height } = Dimensions.get('window');
 const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
@@ -65,7 +64,6 @@ export default function ImagesSection({ images }) {
 
   return (
     <View style={styles.container}>
-      <SectionTitle title="Görseller" />
       {renderImageRow('Arka Planlar', backdrops, 130)}
       {renderImageRow('Afişler', posters, 180)}
       {renderImageRow('Logolar', logos, 100)}
