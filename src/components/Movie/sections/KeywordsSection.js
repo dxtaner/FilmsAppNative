@@ -3,8 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import SectionTitle from './SectionTitle';
 
@@ -16,61 +16,65 @@ export default function KeywordsSection({ keywords }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      horizontal={false}
+      showsVerticalScrollIndicator={false}
+    >
       <SectionTitle title="Anahtar Kelimeler" />
 
-      <FlatList
-        data={keywords}
-        keyExtractor={item => item.id.toString()}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
+      <View style={styles.keywordsWrapper}>
+        {keywords.map(item => (
           <TouchableOpacity
-            style={styles.keywordCard}
-            activeOpacity={0.8}
+            key={item.id.toString()}
+            style={styles.keywordChip}
+            activeOpacity={0.7}
             onPress={() => handleKeywordPress(item)}
           >
             <Text style={styles.keywordText}>{item.name}</Text>
           </TouchableOpacity>
-        )}
-      />
-    </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginHorizontal: 15,
     marginTop: 25,
     marginBottom: 15,
   },
-  row: {
-    flex: 1,
-    justifyContent: 'space-between',
-    marginBottom: 12,
+  contentContainer: {},
+
+  keywordsWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10,
   },
-  keywordCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    marginRight: 10,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+
+  keywordChip: {
+    backgroundColor: '#303030',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    marginRight: 8,
+    marginBottom: 8,
+
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#444',
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
   },
+
   keywordText: {
     color: '#F9D342',
     fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-    letterSpacing: 0.4,
+    fontWeight: '700',
   },
 });
