@@ -9,6 +9,25 @@ import {
 } from 'react-native';
 import SectionTitle from './SectionTitle';
 
+const StarRating = ({ rating }) => {
+  const normalizedRating = Math.round((rating / 10) * 5);
+  const stars = Array(5)
+    .fill(0)
+    .map((_, i) => (
+      <Text
+        key={i}
+        style={[
+          styles.star,
+          i < normalizedRating ? styles.filledStar : styles.emptyStar,
+        ]}
+      >
+        ★
+      </Text>
+    ));
+
+  return <View style={styles.starRatingContainer}>{stars}</View>;
+};
+
 export default function ReviewsSection({ reviews }) {
   if (!reviews || !reviews.length) return null;
 
@@ -19,53 +38,63 @@ export default function ReviewsSection({ reviews }) {
     );
   };
 
+  const renderReview = ({ item }) => {
+    const authorName =
+      item.author_details?.name ||
+      item.author_details?.username ||
+      item.author ||
+      'Bilinmeyen Kullanıcı';
+
+    const rating = item.author_details?.rating;
+    const date = new Date(item.created_at).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    return (
+      <View style={styles.reviewCard}>
+        <View style={styles.header}>
+          <Text style={styles.author} numberOfLines={1}>
+            {authorName}
+          </Text>
+          {rating ? (
+            <View style={styles.ratingContainer}>
+              <StarRating rating={rating} />
+              <Text style={styles.ratingText}>{rating}/10</Text>
+            </View>
+          ) : null}
+        </View>
+
+        <Text style={styles.date}>{date}</Text>
+
+        <Text style={styles.content} numberOfLines={5}>
+          {item.content}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.linkButton}
+          onPress={() => handlePress(item.url)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.linkText}>Tüm Yorumu Gör</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <SectionTitle title="Yorumlar" />
+      <SectionTitle title="Kullanıcı Yorumları" />
 
       <FlatList
         data={reviews}
         keyExtractor={item => item.id.toString()}
+        renderItem={renderReview}
+        horizontal={false}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => {
-          const authorName =
-            item.author_details?.name ||
-            item.author_details?.username ||
-            item.author ||
-            'Bilinmeyen Kullanıcı';
-
-          const rating = item.author_details?.rating;
-          const date = new Date(item.created_at).toLocaleDateString('tr-TR', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-          });
-
-          return (
-            <View style={styles.reviewCard}>
-              <View style={styles.header}>
-                <Text style={styles.author}>{authorName}</Text>
-                {rating ? (
-                  <Text style={styles.rating}>⭐ {rating}/10</Text>
-                ) : null}
-              </View>
-
-              <Text style={styles.date}>{date}</Text>
-
-              <Text style={styles.content} numberOfLines={6}>
-                {item.content}
-              </Text>
-
-              <TouchableOpacity
-                style={styles.linkButton}
-                onPress={() => handlePress(item.url)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.linkText}>Devamını Oku</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        }}
+        contentContainerStyle={styles.listContent}
+        scrollEnabled={false}
       />
     </View>
   );
@@ -73,61 +102,91 @@ export default function ReviewsSection({ reviews }) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 30,
-    marginBottom: 20,
+    paddingHorizontal: 15,
+    marginTop: 35,
+    marginBottom: 25,
+  },
+  listContent: {
+    paddingTop: 5,
   },
   reviewCard: {
-    backgroundColor: '#1b1b1b',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
+    backgroundColor: '#1C1C1E',
+    borderRadius: 12,
+    padding: 18,
+    marginBottom: 18,
     shadowColor: '#000',
-    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
     shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#2D2D2E',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 4,
   },
   author: {
+    color: '#F2F2F7',
+    fontWeight: '800',
+    fontSize: 17,
+    flexShrink: 1,
+    marginRight: 10,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 6,
+    backgroundColor: '#303030',
+  },
+  ratingText: {
     color: '#FFD166',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 14,
+    marginLeft: 4,
   },
-  rating: {
-    color: '#F9D342',
-    fontWeight: '600',
-    fontSize: 13,
+  starRatingContainer: {
+    flexDirection: 'row',
+  },
+  star: {
+    fontSize: 15,
+    marginHorizontal: 0.5,
+  },
+  filledStar: {
+    color: '#FFD166',
+  },
+  emptyStar: {
+    color: '#4A4A4A',
   },
   date: {
-    color: '#aaa',
+    color: '#9C9C9C',
     fontSize: 12,
-    marginTop: 3,
-    marginBottom: 6,
+    marginBottom: 10,
   },
   content: {
-    color: '#f2f2f2',
+    color: '#E5E5EA',
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 22,
+    marginBottom: 15,
   },
   linkButton: {
     alignSelf: 'flex-start',
-    marginTop: 10,
-    backgroundColor: '#FFD16622',
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#FFD16655',
+    backgroundColor: '#FFD166',
+    borderRadius: 10,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    shadowColor: '#FFD166',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   linkText: {
-    color: '#FFD166',
-    fontSize: 13,
-    fontWeight: '600',
+    color: '#1C1C1E',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
