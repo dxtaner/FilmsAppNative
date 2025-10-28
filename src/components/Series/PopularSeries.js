@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPopularSeries } from '../../store/popularSeries/popularSeriesThunk';
+import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
@@ -20,6 +21,7 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 export default function PopularSeries() {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { series, loading, error } = useSelector(state => state.popularSeries);
 
   useEffect(() => {
@@ -27,7 +29,13 @@ export default function PopularSeries() {
   }, [dispatch]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.9}
+      onPress={() =>
+        navigation.navigate('SeriesDetail', { series_id: item.id })
+      }
+    >
       <Image
         source={{
           uri: `${IMAGE_BASE_URL}${item.backdrop_path || item.poster_path}`,
@@ -126,7 +134,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     margin: 10,
-    backdropFilter: 'blur(10px)',
   },
   title: {
     color: '#fff',
