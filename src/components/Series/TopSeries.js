@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTopSeries } from '../../store/topSeries/topSeriesThunk.js';
+import { fetchTopSeries } from '../../store/topSeries/topSeriesThunk';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -29,7 +29,13 @@ export default function TopSeries() {
   }, [dispatch]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.9}
+      onPress={() =>
+        navigation.navigate('SeriesDetail', { series_id: item.id })
+      }
+    >
       <Image
         source={{
           uri: `${IMAGE_BASE_URL}${item.backdrop_path || item.poster_path}`,
