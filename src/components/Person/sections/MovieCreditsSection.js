@@ -1,59 +1,19 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import { View, Text, FlatList, Dimensions, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CreditsCard from './CreditsCard';
 
-const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.55;
 
 export default function MovieCreditsSection({ movieCredits }) {
   const navigation = useNavigation();
-
   if (!movieCredits) return null;
 
-  const showDetails = movieId => {
-    navigation.navigate('MovieDetail', { id: movieId });
-  };
+  const goToMovieDetail = id => navigation.navigate('MovieDetail', { id });
 
   const renderCard = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.8}
-      onPress={() => showDetails(item.id)}
-    >
-      <Image
-        source={
-          item.poster_path
-            ? { uri: IMAGE_BASE_URL + item.poster_path }
-            : { uri: 'https://via.placeholder.com/120x180?text=No+Image' }
-        }
-        style={styles.poster}
-      />
-      <View style={styles.cardContent}>
-        <Text style={styles.title} numberOfLines={1}>
-          {item.title || item.name}
-        </Text>
-        {item.character && (
-          <Text style={styles.subtitle}>🎭 {item.character}</Text>
-        )}
-        {item.job && <Text style={styles.subtitle}>🛠 {item.job}</Text>}
-        {item.release_date && (
-          <Text style={styles.infoText}>📅 {item.release_date}</Text>
-        )}
-        {item.vote_average != null && (
-          <Text style={styles.infoText}>
-            ⭐ {item.vote_average} ({item.vote_count})
-          </Text>
-        )}
-      </View>
-    </TouchableOpacity>
+    <CreditsCard item={item} onPress={goToMovieDetail} />
   );
 
   return (
@@ -62,11 +22,15 @@ export default function MovieCreditsSection({ movieCredits }) {
         <>
           <Text style={styles.sectionTitle}>🎬 Film Kredileri (Oyuncu)</Text>
           <FlatList
-            horizontal
             data={movieCredits.cast}
             keyExtractor={item => item.credit_id || item.id.toString()}
             renderItem={renderCard}
-            showsHorizontalScrollIndicator={false}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16 }}
           />
         </>
@@ -78,11 +42,15 @@ export default function MovieCreditsSection({ movieCredits }) {
             🎬 Film Kredileri (Ekip)
           </Text>
           <FlatList
-            horizontal
             data={movieCredits.crew}
             keyExtractor={item => item.credit_id || item.id.toString()}
             renderItem={renderCard}
-            showsHorizontalScrollIndicator={false}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16 }}
           />
         </>
@@ -92,45 +60,12 @@ export default function MovieCreditsSection({ movieCredits }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d0d0d', paddingVertical: 8 },
+  container: { flex: 1, backgroundColor: '#0d0d0d', paddingVertical: 10 },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#01b4e4',
+    color: '#00bfff',
     marginLeft: 16,
-    marginBottom: 8,
-  },
-  card: {
-    width: width * 0.4,
-    marginRight: 12,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  poster: {
-    width: '100%',
-    height: 200,
-    backgroundColor: '#2a2a2a',
-  },
-  cardContent: { padding: 8 },
-  title: {
-    color: '#FFD166',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  subtitle: {
-    color: '#ccc',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  infoText: {
-    color: '#aaa',
-    fontSize: 11,
-    marginTop: 2,
+    marginBottom: 10,
   },
 });
