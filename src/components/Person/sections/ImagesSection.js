@@ -9,6 +9,7 @@ import {
   Text,
   StyleSheet,
   Dimensions,
+  Animated,
 } from 'react-native';
 
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
@@ -19,6 +20,7 @@ export default function ImagesSection({ images }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const flatListRef = useRef(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   if (!images?.profiles) return null;
 
@@ -30,13 +32,34 @@ export default function ImagesSection({ images }) {
     }, 50);
   };
 
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const renderItem = ({ item, index }) => (
-    <TouchableOpacity onPress={() => openModal(index)}>
-      <Image
-        source={{ uri: IMAGE_BASE_URL + item.file_path }}
-        style={styles.galleryImage}
-      />
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        onPress={() => openModal(index)}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.9}
+      >
+        <Image
+          source={{ uri: IMAGE_BASE_URL + item.file_path }}
+          style={styles.galleryImage}
+        />
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
@@ -88,9 +111,11 @@ export default function ImagesSection({ images }) {
           >
             <Text style={styles.closeText}>✕</Text>
           </TouchableOpacity>
-          <Text style={styles.imageCounter}>
-            {selectedIndex + 1} / {images.profiles.length}
-          </Text>
+          <View style={styles.counterContainer}>
+            <Text style={styles.imageCounter}>
+              {selectedIndex + 1} / {images.profiles.length}
+            </Text>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -100,22 +125,22 @@ export default function ImagesSection({ images }) {
 const styles = StyleSheet.create({
   container: { padding: 16 },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: '#01b4e4',
     marginBottom: 12,
   },
   galleryImage: {
     width: 140,
     height: 210,
-    borderRadius: 12,
+    borderRadius: 16,
     marginRight: 12,
     backgroundColor: '#1c1c1c',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
   },
   modalOverlay: {
     flex: 1,
@@ -129,29 +154,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fullImage: {
-    width: width * 0.9,
+    width: width * 0.95,
     height: height * 0.75,
-    borderRadius: 12,
+    borderRadius: 14,
   },
   closeButton: {
     position: 'absolute',
     top: 50,
     right: 20,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    borderRadius: 25,
+    borderRadius: 30,
     padding: 12,
     zIndex: 2,
   },
-  closeText: { color: '#FFD166', fontSize: 26, fontWeight: '700' },
-  imageCounter: {
+  closeText: { color: '#FFD166', fontSize: 28, fontWeight: '700' },
+  counterContainer: {
     position: 'absolute',
     bottom: 50,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  imageCounter: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
   },
 });
