@@ -1,128 +1,72 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import CreditsCard from './CreditsCard';
 
-const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.55;
 
 export default function TvCreditsSection({ tvCredits }) {
+  const navigation = useNavigation();
   if (!tvCredits) return null;
 
+  const goToSeriesDetail = id =>
+    navigation.navigate('SeriesDetail', { series_id: id });
+
   const renderCard = ({ item }) => (
-    <TouchableOpacity>
-      <View style={styles.card}>
-        <Image
-          source={
-            item.poster_path
-              ? { uri: IMAGE_BASE_URL + item.poster_path }
-              : { uri: 'https://via.placeholder.com/120x180?text=No+Image' }
-          }
-          style={styles.poster}
-        />
-        <View style={styles.cardContent}>
-          <Text style={styles.title} numberOfLines={1}>
-            {item.name || item.title}
-          </Text>
-          {item.character && (
-            <Text style={styles.subtitle}>🎭 {item.character}</Text>
-          )}
-          {item.job && <Text style={styles.subtitle}>🛠 {item.job}</Text>}
-          {item.first_air_date && (
-            <Text style={styles.infoText}>📅 {item.first_air_date}</Text>
-          )}
-          {item.vote_average != null && (
-            <Text style={styles.infoText}>
-              ⭐ {item.vote_average} ({item.vote_count})
-            </Text>
-          )}
-        </View>
-      </View>
-    </TouchableOpacity>
+    <CreditsCard item={item} onPress={goToSeriesDetail} />
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.sectionTitle}>📺 Dizi Kredileri (Oyuncu)</Text>
-      <FlatList
-        horizontal
-        data={tvCredits.cast || []}
-        keyExtractor={item => item.credit_id || item.id.toString()}
-        renderItem={renderCard}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-      />
-
-      {tvCredits.crew?.length > 0 && (
+    <View style={styles.container}>
+      {tvCredits.cast?.length > 0 && (
         <>
-          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
-            📺 Dizi Kredileri (Ekip)
-          </Text>
+          <Text style={styles.sectionTitle}>📺 Dizi Kredileri (Oyuncu)</Text>
           <FlatList
-            horizontal
-            data={tvCredits.crew}
-            keyExtractor={item => item.credit_id}
+            data={tvCredits.cast}
+            keyExtractor={item => item.credit_id || item.id.toString()}
             renderItem={renderCard}
-            showsHorizontalScrollIndicator={false}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16 }}
           />
         </>
       )}
-    </ScrollView>
+
+      {tvCredits.crew?.length > 0 && (
+        <>
+          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
+            🎬 Dizi Kredileri (Ekip)
+          </Text>
+          <FlatList
+            data={tvCredits.crew}
+            keyExtractor={item => item.credit_id || item.id.toString()}
+            renderItem={renderCard}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+          />
+        </>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d0d0d', paddingVertical: 8 },
+  container: { flex: 1, backgroundColor: '#0d0d0d', paddingVertical: 10 },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#01b4e4',
+    color: '#00bfff',
     marginLeft: 16,
-    marginBottom: 8,
-  },
-  card: {
-    width: width * 0.4,
-    marginRight: 12,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  poster: {
-    width: '95%',
-    height: 200,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    backgroundColor: '#2a2a2a',
-    alignSelf: 'center',
-    marginTop: 4,
-  },
-  cardContent: { padding: 8 },
-  title: {
-    color: '#FFD166',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  subtitle: {
-    color: '#ccc',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  infoText: {
-    color: '#aaa',
-    fontSize: 11,
-    marginTop: 2,
+    marginBottom: 10,
   },
 });
