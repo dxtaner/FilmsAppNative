@@ -27,21 +27,21 @@ const MovieListTab = ({ data, navigation }) => {
   if (!data || data.length === 0) {
     return (
       <View style={styles.center}>
-        <Text>Film bulunamadı.</Text>
+        <Text style={styles.emptyText}>Film bulunamadı.</Text>
       </View>
     );
   }
-
-  const handleDetails = id => {
-    if (id) navigation.navigate('MovieDetail', { id });
-  };
 
   return (
     <FlatList
       data={data}
       keyExtractor={item => item.id.toString()}
       renderItem={({ item }) => (
-        <MovieCard onPress={() => handleDetails(item.id)} movie={item} />
+        <MovieCard
+          onPress={() => navigation.navigate('MovieDetail', { id: item.id })}
+          movie={item}
+          dark
+        />
       )}
       contentContainerStyle={{ padding: 12, paddingBottom: 24 }}
       showsVerticalScrollIndicator={false}
@@ -117,7 +117,7 @@ export default function Dashboard({ navigation }) {
   if (!sessionId)
     return (
       <View style={styles.center}>
-        <Text style={{ fontSize: 16, color: '#333' }}>Lütfen giriş yapın.</Text>
+        <Text style={styles.emptyText}>Lütfen giriş yapın.</Text>
       </View>
     );
 
@@ -146,8 +146,12 @@ export default function Dashboard({ navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-            <Ionicons name="log-out" size={20} color="#fff" />
+          <TouchableOpacity
+            style={styles.logoutBtn}
+            onPress={handleLogout}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="log-out-outline" size={20} color="#fff" />
             <Text style={styles.logoutText}>Çıkış Yap</Text>
           </TouchableOpacity>
         </View>
@@ -156,10 +160,18 @@ export default function Dashboard({ navigation }) {
       <Tab.Navigator
         screenOptions={{
           tabBarActiveTintColor: '#01b4e4',
-          tabBarInactiveTintColor: '#999',
-          tabBarIndicatorStyle: { backgroundColor: '#01b4e4', height: 3 },
+          tabBarInactiveTintColor: '#888',
+          tabBarIndicatorStyle: {
+            backgroundColor: '#01b4e4',
+            height: 3,
+            borderRadius: 2,
+          },
           tabBarLabelStyle: { fontWeight: '700', fontSize: 14 },
-          tabBarStyle: { backgroundColor: '#fff' },
+          tabBarStyle: {
+            backgroundColor: '#121212',
+            elevation: 0,
+            shadowOpacity: 0,
+          },
         }}
       >
         <Tab.Screen name="Favori">
@@ -177,23 +189,28 @@ export default function Dashboard({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fa' },
+  container: { flex: 1, backgroundColor: '#0d0d0d' },
   accountHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#01b4e4',
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    backgroundColor: '#1f1f1f',
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    shadowColor: '#01b4e4',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 6,
   },
   accountInfo: { flexDirection: 'row', alignItems: 'center' },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: '#01b4e4',
     marginRight: 12,
   },
   avatarFallback: {
@@ -201,18 +218,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarFallbackText: { color: '#fff', fontWeight: '700', fontSize: 20 },
+  avatarFallbackText: { color: '#fff', fontWeight: '700', fontSize: 22 },
   accountText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#ff4d4d',
     paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    shadowColor: '#ff4d4d',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
   },
   logoutText: { color: '#fff', fontWeight: '700', marginLeft: 6 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyText: { fontSize: 16, color: '#aaa' },
   error: {
     color: 'red',
     fontSize: 16,
