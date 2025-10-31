@@ -40,9 +40,9 @@ export default function ExId({ externalIds }) {
       url: externalIds.twitter_id
         ? `https://twitter.com/${externalIds.twitter_id}`
         : null,
-      color: '#000000',
-      backgroundColor: '#FFFFFF',
-      textColor: '#000000',
+      color: '#1DA1F2',
+      backgroundColor: '#E6F0FA',
+      textColor: '#000',
     },
     {
       id: 'instagram',
@@ -67,7 +67,7 @@ export default function ExId({ externalIds }) {
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.sectionTitle}>Dış Bağlantılar</Text>{' '}
+        <Text style={styles.sectionTitle}>Dış Bağlantılar</Text>
       </View>
 
       <View style={styles.chipsWrapper}>
@@ -85,11 +85,10 @@ export default function ExId({ externalIds }) {
               <View style={[styles.iconContainer, { borderColor: link.color }]}>
                 <Icon
                   name={link.iconName}
-                  size={12}
-                  color={link.id === 'twitter' ? '#000000' : link.color}
+                  size={14}
+                  color={link.textColor || link.color}
                 />
               </View>
-
               <Text
                 style={[styles.chipLabel, { color: link.textColor || '#fff' }]}
               >
@@ -131,7 +130,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginRight: 10,
     marginBottom: 10,
-
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -146,15 +144,14 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 8,
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 11,
     borderWidth: 1,
   },
   chipLabel: {
-    color: '#fff',
     fontSize: 14,
     fontWeight: '700',
   },
