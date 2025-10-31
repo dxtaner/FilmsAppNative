@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Linking } from 'react-native';
 import SectionTitle from './SectionTitle';
 
-// Basit bir ikonlu detay kartı oluşturmak için yardımcı fonksiyon
 const DetailItem = ({ label, value, color = '#fff' }) => (
   <View style={styles.detailItem}>
     <Text style={styles.detailLabel}>{label}</Text>
@@ -90,7 +89,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  // Tagline
   taglineContainer: {
     marginBottom: 20,
     paddingVertical: 12,
@@ -107,7 +105,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Overview
   overviewText: {
     color: '#eee',
     fontSize: 15,
@@ -115,7 +112,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  // Detay Kartı
   detailsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-around',
