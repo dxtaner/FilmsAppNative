@@ -52,7 +52,13 @@ export default function PersonDetail() {
   const renderContent = () => {
     switch (activeTab) {
       case 'info':
-        return <PersonInfoSection detail={detail} externalIds={externalIds} />;
+        return (
+          <PersonInfoSection
+            detail={detail}
+            moviesCount={movieCredits?.cast?.length}
+            externalIds={externalIds}
+          />
+        );
       case 'movies':
         return <MovieCreditsSection movieCredits={movieCredits} />;
       case 'tv':
