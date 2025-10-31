@@ -28,7 +28,7 @@ import CreditsSection from './sections/CreditsSection';
 import PopularMoviesCarousel from '../Home/PopularMoviesCarousel';
 
 const { width, height } = Dimensions.get('window');
-const INITIAL_TAB_HEIGHT = height * 0.8; // Başlangıç minimum yükseklik
+const INITIAL_TAB_HEIGHT = height * 0.8;
 
 export default function MovieDetailPage() {
   const route = useRoute();
