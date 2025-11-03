@@ -6,6 +6,33 @@ Users can browse popular content, discover new titles, view detailed pages, sear
 
 ---
 
+## 🎞️ App Preview
+
+<p align="center">
+  <i>Experience Taner’s Movie App in action — smooth animations, dark-themed elegance, and real-time movie exploration.</i>
+</p>
+
+<p align="center">
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp.gif" width="250" alt="Movie App Demo 1" />
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp2.gif" width="250" alt="Movie App Demo 2" />
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp3.gif" width="250" alt="Movie App Demo 3" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp4.gif" width="250" alt="Movie App Demo 4" />
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp5.gif" width="250" alt="Movie App Demo 5" />
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp6.gif" width="250" alt="Movie App Demo 6" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/dxtaner/FilmsAppNative/blob/main/ScreensShots/MovieMobileApp7.gif" width="250" alt="Movie App Demo 7" />
+</p>
+
+<p align="center">
+  <b>🎬 From discovery to details — explore movies, series, and stars with cinematic fluidity.</b>
+</p>
+
+
 ## 🚀 Features
 
 - 🎥 **Popular Movies** – Browse the latest and trending movies  
