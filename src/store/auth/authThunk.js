@@ -5,7 +5,6 @@ import {
   authenticateUser,
 } from './authAPI';
 
-// 1️⃣ Request token al
 export const fetchAuthToken = createAsyncThunk(
   'auth/fetchAuthToken',
   async (_, { rejectWithValue }) => {
@@ -20,7 +19,6 @@ export const fetchAuthToken = createAsyncThunk(
   },
 );
 
-// 2️⃣ Kullanıcıyı doğrula
 export const validateLogin = createAsyncThunk(
   'auth/validateLogin',
   async (credentials, { rejectWithValue }) => {
@@ -35,7 +33,6 @@ export const validateLogin = createAsyncThunk(
   },
 );
 
-// 3️⃣ Session oluştur
 export const createUserSession = createAsyncThunk(
   'auth/createUserSession',
   async (request_token, { rejectWithValue }) => {

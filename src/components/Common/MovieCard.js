@@ -5,18 +5,35 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useDispatch } from 'react-redux';
+import {
+  toggleFavorite,
+  toggleWatchlist,
+  rateMovie,
+} from '../../store/adding/tmdbSlice';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.92;
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w342';
 
-export default function MovieCard({ movie, onPress, genres = [] }) {
+export default function MovieCard({
+  movie,
+  onPress,
+  genres = [],
+  accountId,
+  sessionId,
+}) {
   const [showInfo, setShowInfo] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(movie?.favorite || false);
+  const [isWatchlist, setIsWatchlist] = useState(movie?.watchlist || false);
+  const dispatch = useDispatch();
 
   const posterUri = movie?.poster_path
     ? `${IMAGE_BASE_URL}${movie.poster_path}`
@@ -31,13 +48,55 @@ export default function MovieCard({ movie, onPress, genres = [] }) {
 
   const popularityColor = getPopularityColor(movie?.vote_average || 0);
 
+  // 🔹 Favori toggle
+  const handleFavorite = async () => {
+    setIsFavorite(prev => !prev);
+    try {
+      await dispatch(
+        toggleFavorite({
+          accountId,
+          sessionId,
+          mediaId: movie.id,
+          favorite: !isFavorite,
+        }),
+      );
+    } catch (err) {
+      Alert.alert('Hata', 'Favori eklenirken bir hata oluştu.');
+    }
+  };
+
+  // 🔹 Watchlist toggle
+  const handleWatchlist = async () => {
+    setIsWatchlist(prev => !prev);
+    try {
+      await dispatch(
+        toggleWatchlist({
+          accountId,
+          sessionId,
+          mediaId: movie.id,
+          watchlist: !isWatchlist,
+        }),
+      );
+    } catch (err) {
+      Alert.alert('Hata', 'Watchlist eklenirken bir hata oluştu.');
+    }
+  };
+
+  // 🔹 Rating (örnek: sabit 8 puan)
+  const handleRate = async (value = 8) => {
+    try {
+      await dispatch(rateMovie({ movieId: movie.id, sessionId, value }));
+      Alert.alert('Başarılı', `Filme ${value} puan verdiniz!`);
+    } catch (err) {
+      Alert.alert('Hata', 'Puanlama sırasında bir hata oluştu.');
+    }
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.card}
-      activeOpacity={0.9}
       onPress={() => onPress && onPress(movie?.id)}
-      onPressIn={() => setShowInfo(true)}
-      onPressOut={() => setShowInfo(false)}
+      onLongPress={() => setShowInfo(prev => !prev)}
     >
       {posterUri ? (
         <Image source={{ uri: posterUri }} style={styles.image} />
@@ -55,12 +114,43 @@ export default function MovieCard({ movie, onPress, genres = [] }) {
         </Text>
       </View>
 
-      {/* Gradient overlay sadece alt için */}
+      {/* Alt: Favori / Watchlist / Rating ikonları yalnızca session varsa */}
+      {accountId && sessionId && (
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            onPress={handleFavorite}
+            style={styles.actionButton}
+          >
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={22}
+              color="#f54242"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleWatchlist}
+            style={styles.actionButton}
+          >
+            <Ionicons
+              name={isWatchlist ? 'bookmark' : 'bookmark-outline'}
+              size={22}
+              color="#01b4e4"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleRate(8)}
+            style={styles.actionButton}
+          >
+            <Ionicons name="star-outline" size={22} color="#FFD700" />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Gradient overlay */}
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.9)']}
         style={styles.gradientOverlay}
       >
-        {/* Sol alt: Başlık ve yıl */}
         <View style={styles.bottomContainer}>
           <Text style={styles.title} numberOfLines={1}>
             {movie?.title || '—'}
@@ -71,25 +161,26 @@ export default function MovieCard({ movie, onPress, genres = [] }) {
         </View>
       </LinearGradient>
 
-      {/* Info overlay (basılı tutulunca göster) */}
+      {/* Info overlay */}
       {showInfo && (
         <View style={styles.infoOverlay}>
           <Text style={styles.overview} numberOfLines={4}>
             {movie?.overview || 'Bilgi yok.'}
           </Text>
           <View style={styles.genreRow}>
-            {movie?.genre_ids?.map(id => {
-              const genre = genres.find(g => g.id === id);
-              return genre ? (
-                <View key={genre.id} style={styles.genreChip}>
-                  <Text style={styles.genreText}>{genre.name}</Text>
-                </View>
-              ) : null;
-            })}
+            {Array.isArray(movie?.genre_ids) &&
+              movie.genre_ids.map(id => {
+                const genre = genres.find(g => g.id === id);
+                return genre ? (
+                  <View key={genre.id} style={styles.genreChip}>
+                    <Text style={styles.genreText}>{genre.name}</Text>
+                  </View>
+                ) : null;
+              })}
           </View>
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -132,8 +223,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 8,
-    elevation: 6,
-    zIndex: 10,
   },
   vote: {
     marginLeft: 4,
@@ -186,5 +275,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#fff',
     fontWeight: '600',
+  },
+  actionRow: {
+    position: 'absolute',
+    bottom: 40,
+    right: 8,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 12,
+    padding: 4,
+  },
+  actionButton: {
+    marginHorizontal: 4,
   },
 });

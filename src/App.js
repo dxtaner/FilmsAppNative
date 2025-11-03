@@ -84,7 +84,7 @@ function CustomDrawerContent(props) {
     <DrawerContentScrollView
       {...props}
       contentContainerStyle={styles.drawerContainer}
-      key={currentSession} // session değişince yeniden render
+      key={currentSession}
     >
       <SafeAreaView style={styles.drawerHeader}>
         <Image source={require('./assets/logo.png')} style={styles.logo} />

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -22,7 +21,7 @@ import {
 
 export default function Login() {
   const dispatch = useDispatch();
-  const navigation = useNavigation(); // 👈 navigation hook eklendi
+  const navigation = useNavigation();
   const { loading, requestToken, error } = useSelector(state => state.auth);
 
   const [username, setUsername] = useState('');
