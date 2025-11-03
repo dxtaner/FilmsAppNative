@@ -64,5 +64,38 @@ Users can browse popular content, discover new titles, view detailed pages, sear
 
 ---
 
+## 🧩 Project Highlights
+
+- Clean **component-based architecture**  
+- Optimized **API calls** with error handling  
+- Fully **responsive** across Android & iOS  
+- Integrated **Redux slices** for modular state logic  
+- Emphasis on **UX motion and smooth transitions**
+
+---
+
+## 🧠 Learning Focus
+
+This project was developed to strengthen skills in:
+
+- React Native app architecture  
+- Redux Toolkit & Async Thunks  
+- TMDB API integration  
+- Navigation stack management  
+- UI consistency & theming  
+
+---
+
+## 👨‍💻 Author
+
+**Developed by [Taner Özer](https://github.com/dxtaner)**  
+📍 Bursa, Turkey  
+📧 [tanerozer16@gmail.com](mailto:tanerozer16@gmail.com)  
+
+---
+
+## ⭐ Show Your Support
+
+If you like this project, give it a **⭐ on GitHub** — your support motivates further development! 💪  
 
 
